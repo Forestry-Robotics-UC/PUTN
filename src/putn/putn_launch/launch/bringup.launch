@@ -1,10 +1,19 @@
 <launch>
-  <include file="$(find aloam_velodyne)/launch/aloam_velodyne_HDL_32.launch">
+
+  <param name="/use_sim_time" value="true" />
+
+  <include file="$(find aloam_velodyne)/launch/aloam_ouster_128.launch">
 	  <arg name="rviz" value="false"/>
   </include>
 
   <node pkg="tf" type="static_transform_publisher" name="world_to_camera_init" args="0 0 0 0 0 0 /world /camera_init 10" /><!--10ms-->
   <node pkg="tf" type="static_transform_publisher" name="camera_to_link" args="0 0 -0.4 0 0 0 /aft_mapped /base_link 10" />
+
+  <node pkg="tf" type="static_transform_publisher" name="ouster_to_base" args="0 0 0.0 0 0 0 /base_link /os_sensor 10" />
+
+  <!---node pkg="tf" type="static_transform_publisher" name="camera_to_aft" args="0 0 0.0 0 0 0 /camera_init /aft_mapped 10" /-->
+
+  <node pkg="putn_launch" type="twist_to_twist_stamped.py" name="twist_to_twist_stamped" output="screen" />
 
   <node pkg="waypoint_generator" name="waypoint_generator" type="waypoint_generator">
       <remap from="~goal" to="/goal"/>
@@ -36,7 +45,13 @@
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find putn_launch)/rviz_config/simulation.rviz" required="true"/>
 
-  <node name="local_planner" pkg="local_planner" type="local_planner.py" launch-prefix="gnome-terminal --title=local_planner -x"/>
-  <node name="controller" pkg="local_planner" type="controller.py" launch-prefix="gnome-terminal --title=controller -x"/>
+  <!---node name="local_planner" pkg="local_planner" type="local_planner.py" launch-prefix="gnome-terminal -title=local_planner -x"/>
+  <node name="controller" pkg="local_planner" type="controller.py" launch-prefix="gnome-terminal -title=controller -x"/-->
+
+  <node name="local_planner" pkg="local_planner" type="local_planner.py"
+      launch-prefix="xterm -title local_planner -hold -e" output="screen" />
+
+  <node name="controller" pkg="local_planner" type="controller.py"
+      launch-prefix="xterm -title controller -hold -e" output="screen" />
 
 </launch>
