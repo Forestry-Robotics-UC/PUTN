@@ -46,7 +46,10 @@
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find putn_launch)/rviz_config/simulation.rviz" required="true"/>
 
-  <node name="local_planner" pkg="local_planner" type="local_planner.py" launch-prefix="gnome-terminal --title=local_planner -x"/>
-  <node name="controller" pkg="local_planner" type="controller.py" launch-prefix="gnome-terminal --title=controller -x"/>
+  <node name="local_planner" pkg="local_planner" type="local_planner.py"
+      launch-prefix="xterm -title local_planner -hold -e" output="screen" />
+
+  <node name="controller" pkg="local_planner" type="controller.py"
+      launch-prefix="xterm -title controller -hold -e" output="screen" />
 
 </launch>
