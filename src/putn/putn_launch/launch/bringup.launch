@@ -1,6 +1,6 @@
 <launch>
 
-  <param name="/use_sim_time" value="true" />
+  <param name="/use_sim_time" value="false" />
 
   <include file="$(find aloam_velodyne)/launch/aloam_ouster_128.launch">
 	  <arg name="rviz" value="false"/>
@@ -49,7 +49,7 @@
 
   <!-- <node name="local_planner" pkg="local_planner" type="local_planner.py" launch-prefix="xterm -title local_planner -hold -e" output="log" /> -->
 
-  <node name="controller" pkg="local_planner" type="controller.py" launch-prefix="xterm -title controller -hold -e" output="log" />
+  <!-- <node name="controller" pkg="local_planner" type="controller.py" launch-prefix="xterm -title controller -hold -e" output="log" /> -->
 
   <node name="local_planner" pkg="local_planner" type="local_planner.py" output="log" />
 
