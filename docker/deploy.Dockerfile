@@ -97,7 +97,7 @@ RUN /bin/bash -c "source /opt/ros/melodic/setup.bash && \
 # Environment setup
 ############################
 RUN echo "source /root/catkin_ws/devel/setup.bash" >> /root/.bashrc
-
+RUN chmod +x /root/catkin_ws/src/PUTN/src/putn/putn_mpc/scripts/*
 ############################
 # Default command
 ############################
