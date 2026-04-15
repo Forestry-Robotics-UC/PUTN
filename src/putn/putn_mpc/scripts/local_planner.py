@@ -151,17 +151,26 @@ class Local_Planner():
         return number
 
     def choose_goal_state(self):
-        num = self.find_min_distance(self.curr_state)
-        scale = 1
-        num_list = []
-        for i in range(self.N):  
-            num_path = min(self.desired_global_path[1]-1,int(num+i*scale))
-            num_list.append(num_path)
-        if(num  >= self.desired_global_path[1]):
+        path = self.desired_global_path[0]
+        path_size = int(self.desired_global_path[1])
+
+        # Keep size consistent with real buffer length
+        path_size = min(path_size, path.shape[0])
+        if path_size <= 0:
             self.is_end = 1
+            return False
+
+        # Find nearest point only inside valid slice
+        dists = [self.distance_global(self.curr_state, path[i]) for i in range(path_size)]
+        num = int(np.argmin(np.array(dists)))
+
+        self.is_end = 1 if num >= (path_size - 1) else 0
+
         for k in range(self.N):
-            self.goal_state[k] = self.desired_global_path[0][num_list[k]]
-        print(self.goal_state)
+            idx = min(path_size - 1, num + k)
+            self.goal_state[k] = path[idx]
+
+        return True
 
     def __curr_pose_cb(self, data):
         self.robot_state_set = True
@@ -184,15 +193,23 @@ class Local_Planner():
                 self.desired_global_path[0][i,2]=data.data[3*(size-i)-1]
     
     def _global_path_callback2(self, data):
-        if(len(data.data)!=0):
-            self.ref_path_set = True
-            size = len(data.data)/5
-            self.desired_global_path[1]=size
-            for i in range(size):
-                self.desired_global_path[0][i,0]=data.data[5*(size-i)-5]
-                self.desired_global_path[0][i,1]=data.data[5*(size-i)-4]
-                self.desired_global_path[0][i,2]=data.data[5*(size-i)-2]
-                self.desired_global_path[0][i,3]=data.data[5*(size-i)-1]
+        n = len(data.data)
+        if n < 5:
+            self.ref_path_set = False
+            return
+
+        size = n // 5
+        new_path = np.zeros((size, 4), dtype=np.float32)
+
+        for i in range(size):
+            base = 5 * (size - i) - 5
+            new_path[i, 0] = data.data[base + 0]
+            new_path[i, 1] = data.data[base + 1]
+            new_path[i, 2] = data.data[base + 3]
+            new_path[i, 3] = data.data[base + 4]
+
+        self.desired_global_path = [new_path, size]
+        self.ref_path_set = True
             
     def cmd(self, data):
         
