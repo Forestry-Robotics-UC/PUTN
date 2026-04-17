@@ -1,13 +1,17 @@
 <launch>
 
-  <arg name="rviz_aloam" default="false" />
   <arg name="rviz_putn" default="false" />
+  <arg name="rviz_aloam" default="false" />
   <arg name="use_sim_time" default="false" />
+  <arg name="mapping_line_resolution" default="0.075" />
+  <arg name="mapping_plane_resolution" default="0.15" />
 
   <param name="/use_sim_time" value="$(arg use_sim_time)" />
 
   <include file="$(find aloam_velodyne)/launch/aloam_ouster_128.launch">
 	  <arg name="rviz" value="$(arg rviz_aloam)"/>
+      <arg name="mapping_line_resolution" value="$(arg mapping_line_resolution)"/>
+      <arg name="mapping_plane_resolution" value="$(arg mapping_plane_resolution)"/>
   </include>
 
 
@@ -57,7 +61,7 @@
 
   <!-- <node name="controller" pkg="local_planner" type="controller.py" launch-prefix="xterm -title controller -hold -e" output="log" /> -->
 
-  <node name="local_planner" pkg="local_planner" type="local_planner.py" output="log" />
+  <node name="local_planner" pkg="local_planner" type="local_planner.py" output="log" required="true"/>
 
   <!-- <node name="controller" pkg="local_planner" type="controller.py" output="log" /> -->
 
