@@ -122,7 +122,7 @@ class Local_Planner():
         local_plan = Float32MultiArray()
         sequ = 0
         local_path.header.stamp = rospy.Time.now()
-        local_path.header.frame_id = "/world"
+        local_path.header.frame_id = "world"
 
         for i in range(self.N):
             this_pose_stamped = PoseStamped()
@@ -132,7 +132,7 @@ class Local_Planner():
             this_pose_stamped.header.seq = sequ
             sequ += 1
             this_pose_stamped.header.stamp = rospy.Time.now()
-            this_pose_stamped.header.frame_id="/world"
+            this_pose_stamped.header.frame_id="world"
             local_path.poses.append(this_pose_stamped)
             
             for j in range(2):
