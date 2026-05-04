@@ -37,6 +37,7 @@ class Controller():
         self.time_sol = 0
         self.local_plan = np.zeros([self.N, 2])
         self.control_cmd = Twist()
+        self.last_plan_time = rospy.Time(0)
         self.control_loop()
 
     def quart_to_rpy(self, x, y, z, w):
@@ -92,12 +93,22 @@ class Controller():
         self.cmd(np.array([0.0, 0.0]))
 
     def auto(self):
+        timeout = 0.5  # seconds
+
         while not rospy.is_shutdown():
             key = self.getKey()
             if key == 'q':
                 return True
-            ref_inputs = self.local_plan[0]
-            self.cmd(ref_inputs)
+
+            time_since_last = (rospy.Time.now() - self.last_plan_time).to_sec()
+
+            if time_since_last > timeout:
+                # No recent update -> STOP
+                self.cmd(np.array([0.0, 0.0]))
+            else:
+                ref_inputs = self.local_plan[0]
+                self.cmd(ref_inputs)
+
             self.rate.sleep()
 
     def manual(self):
@@ -175,6 +186,8 @@ class Controller():
         for i in range(self.N):
             self.local_plan[i, 0] = msg.data[0+2*i]
             self.local_plan[i, 1] = msg.data[1+2*i]
+        
+        self.last_plan_time = rospy.Time.now()
 
 
 if __name__ == '__main__':
